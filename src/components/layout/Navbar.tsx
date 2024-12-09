@@ -1,20 +1,28 @@
 import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Container } from './Container';
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-white shadow-sm sticky top-0 z-50">
       <Container>
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
-            <span className="text-xl font-bold text-gray-800">JegSu</span>
+            <Link to="/" className="text-xl font-bold text-gray-800 hover:text-indigo-600 transition-colors">
+              JegSu
+            </Link>
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <NavLinks />
+            <NavLinks isActive={isActive} />
           </div>
           
           <div className="md:hidden">
@@ -32,7 +40,7 @@ export function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <NavLinks mobile />
+            <NavLinks mobile isActive={isActive} />
           </div>
         </div>
       )}
@@ -40,29 +48,31 @@ export function Navbar() {
   );
 }
 
-function NavLinks({ mobile = false }: { mobile?: boolean }) {
+function NavLinks({ mobile = false, isActive }: { mobile?: boolean, isActive: (path: string) => boolean }) {
   const links = [
-    { href: '#features', text: 'Features' },
-    { href: '#about', text: 'About' },
-    { href: '#contact', text: 'Contact' },
+    { to: '/features', text: 'Features' },
+    { to: '/about', text: 'About' },
+    { to: '/contact', text: 'Contact' },
   ];
 
   const baseStyles = mobile
     ? 'block px-3 py-2 text-base font-medium rounded-md'
-    : 'text-gray-600 hover:text-gray-900';
+    : 'text-gray-600 hover:text-gray-900 transition-colors';
 
   return (
     <>
       {links.map((link) => (
-        <a
-          key={link.href}
-          href={link.href}
+        <Link
+          key={link.to}
+          to={link.to}
           className={`${baseStyles} ${
-            mobile ? 'text-gray-700 hover:text-gray-900 hover:bg-gray-50' : ''
+            isActive(link.to) 
+              ? 'text-indigo-600 font-semibold' 
+              : mobile ? 'text-gray-700 hover:text-gray-900 hover:bg-gray-50' : ''
           }`}
         >
           {link.text}
-        </a>
+        </Link>
       ))}
     </>
   );
